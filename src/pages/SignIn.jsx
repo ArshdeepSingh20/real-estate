@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/users/user.slice";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({
@@ -18,24 +25,21 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(signInStart());
 
     try {
       const res = await axios.post("/api/v1/auth/signin", formData);
       const data = res.data;
 
       if (data.success === false) {
-        setError(data.message);
-        setLoading(false);
+        dispatch(signInFailure(data.message));
         return;
       }
-      setLoading(false);
-      setError(null);
+      dispatch(signInSuccess(data));
 
       navigate("/");
     } catch (error) {
-      setLoading(false);
-      setError(error.response.data.message);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -64,10 +68,12 @@ export default function SignIn() {
 
         <button
           disabled={loading}
-          className="bg-slate-700 rounded-lg text-white p-3 uppercase hover:opacity-95 disabled:opacity-80 cursor-pointer"
+          className="bg-slate-700 rounded-lg text-white p-3 uppercase hover:opacity-95 disabled:opacity-80"
         >
           {loading ? "Signing In..." : "Sign In"}
         </button>
+
+        <OAuth/>
       </form>
 
       <div className="flex gap-2 mt-5">
