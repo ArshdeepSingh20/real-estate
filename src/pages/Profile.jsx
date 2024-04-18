@@ -19,6 +19,7 @@ import {
   signOutUserSuccess,
 } from "../redux/users/user.slice.js";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -188,6 +189,13 @@ export default function Profile() {
         >
           {loading ? "updating..." : "Update"}
         </button>
+
+        <Link
+          className="text-white bg-green-700 p-3 rounded-lg uppercase text-center hover:opacity-95"
+          to={"/create-listing"}
+        >
+          Create Listing
+        </Link>
       </form>
 
       <div className="flex justify-between mt-5">
